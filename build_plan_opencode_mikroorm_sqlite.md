@@ -1,4 +1,4 @@
-# 🏗️ Plan de BUILD para OpenCode: Especificación Técnica de Clases y Relaciones MikroORM / SQLite3
+
 
 **Proyecto:** Plataforma de Transporte Espacial Multi-Facción — FlySolo  
 **Documento Fuente (La Biblia):** Modelo de Dominio Definitivo Aprobado  
@@ -16,7 +16,7 @@
 
 ---
 
-## 🎨 2. Especificación de Enums (`src/shared/enums/`)
+# Especificación de Enums (`src/shared/enums/`)
 
 ### File: `src/shared/enums/domain.enums.ts`
 

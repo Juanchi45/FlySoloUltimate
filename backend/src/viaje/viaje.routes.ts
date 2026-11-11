@@ -24,8 +24,8 @@ viajeRouter.patch('/:id/aceptar', verificarToken, soloPiloto, aceptarViaje);
 viajeRouter.patch('/:id/finalizar', verificarToken, finalizarViaje);
 viajeRouter.patch('/:id/cancelar', verificarToken, cancelarViaje);
 
-viajeRouter.get('/verViajes', findAllViajes);
-viajeRouter.get('/verViaje/:id', findOneViaje);
+viajeRouter.get('/verViajes', verificarToken, findAllViajes);
+viajeRouter.get('/verViaje/:id', verificarToken, findOneViaje);
 viajeRouter.post('/create', verificarToken, soloAdmin, sanitizeViajeInput, addViaje);
 viajeRouter.put('/update/:id', verificarToken, soloAdmin, sanitizeViajeInput, actualizaViaje);
 viajeRouter.patch('/update/:id', verificarToken, soloAdmin, sanitizeViajeInput, actualizaViaje);

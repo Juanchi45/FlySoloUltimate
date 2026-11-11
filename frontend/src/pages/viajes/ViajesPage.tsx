@@ -48,7 +48,7 @@ function ViajesPage() {
 
   async function cargar(estado = estadoFiltro) {
     const query = estado ? `?estado=${estado}` : '';
-    const res = await fetch(`${API_URL}/viajes/verViajes${query}`);
+    const res = await fetch(`${API_URL}/viajes/verViajes${query}`, { headers: authHeaders() });
     const data = await res.json();
     setViajes(data.data ?? []);
   }
@@ -71,7 +71,7 @@ function ViajesPage() {
   }, []);
 
   async function seleccionar(id: number) {
-    const res = await fetch(`${API_URL}/viajes/verViaje/${id}`);
+    const res = await fetch(`${API_URL}/viajes/verViaje/${id}`, { headers: authHeaders() });
     const data = await res.json();
     if (res.ok) {
       setSeleccionado(data.data);

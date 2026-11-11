@@ -46,7 +46,7 @@ function NavesPage() {
 
   async function cargar(modelo = filtro) {
     const query = modelo.trim() ? `?modelo=${encodeURIComponent(modelo.trim())}` : '';
-    const res = await fetch(`${API_URL}/naves/verNaves${query}`);
+    const res = await fetch(`${API_URL}/naves/verNaves${query}`, { headers: authHeaders() });
     const data = await res.json();
     setNaves(data.data ?? []);
   }
@@ -75,7 +75,7 @@ function NavesPage() {
   }, [filtro]);
 
   async function seleccionar(id: number) {
-    const res = await fetch(`${API_URL}/naves/verNave/${id}`);
+    const res = await fetch(`${API_URL}/naves/verNave/${id}`, { headers: authHeaders() });
     const data = await res.json();
     if (res.ok) {
       setSeleccionada(data.data);

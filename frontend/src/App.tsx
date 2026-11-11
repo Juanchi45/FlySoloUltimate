@@ -20,12 +20,14 @@ function homeDeRol(rol: number): string {
 }
 
 // Protege rutas según el rol almacenado en sessionStorage (sesión por pestaña)
-function RutaProtegida({ children, rolRequerido }: { children: ReactNode; rolRequerido: number }) {
+// rolRequerido puede ser un rol (ej. 2) o una lista de roles permitidos (ej. [1, 2])
+function RutaProtegida({ children, rolRequerido }: { children: ReactNode; rolRequerido: number | number[] }) {
   const token = sessionStorage.getItem('token');
   const rol = Number(sessionStorage.getItem('es_piloto') ?? '-1');
+  const permitidos = Array.isArray(rolRequerido) ? rolRequerido : [rolRequerido];
 
   if (!token || rol < 0) return <Navigate to="/login" replace />;
-  if (rol !== rolRequerido) return <Navigate to={homeDeRol(rol)} replace />;
+  if (!permitidos.includes(rol)) return <Navigate to={homeDeRol(rol)} replace />;
   return children;
 }
 
@@ -36,11 +38,15 @@ function App() {
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
       <Route path="/listarUsuarios" element={<ListarUsuarios />} />
-      <Route path="/planetas" element={<PlanetasPage />} />
+      <Route path="/planetas" element={
+        <RutaProtegida rolRequerido={[1, 2]}><PlanetasPage /></RutaProtegida>
+      } />
       <Route path="/naves" element={
         <RutaProtegida rolRequerido={2}><NavesPage /></RutaProtegida>
       } />
-      <Route path="/viajes" element={<ViajesPage />} />
+      <Route path="/viajes" element={
+        <RutaProtegida rolRequerido={[1, 2]}><ViajesPage /></RutaProtegida>
+      } />
       <Route path="/resenas" element={
         <RutaProtegida rolRequerido={1}><ResenasPage /></RutaProtegida>
       } />

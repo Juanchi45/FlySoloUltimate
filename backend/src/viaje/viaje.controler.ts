@@ -50,21 +50,33 @@ function resumenViaje(viaje: Viaje) {
     };
 }
 
-async function findAllViajes(req: Request, res: Response){
+async function findAllViajes(req: AuthRequest, res: Response){
     try{
         const estado = req.query.estado as string | undefined;
         const usuarioId = req.query.usuarioId as string | undefined;
         const pilotoId = req.query.pilotoId as string | undefined;
+        const rol = req.usuario!.es_piloto;
+        const miId = req.usuario!.id;
 
         const filtro: FilterQuery<Viaje> = {};
         if (estado && Object.values(EstadoViaje).includes(estado as EstadoViaje)) {
             filtro.estado = estado as EstadoViaje;
         }
-        if (usuarioId && !Number.isNaN(Number(usuarioId))) {
-            filtro.usuario = Number(usuarioId);
-        }
-        if (pilotoId && !Number.isNaN(Number(pilotoId))) {
-            filtro.piloto = Number(pilotoId);
+
+        if (rol === 2) {
+            // Admin: ve todos y puede filtrar por pasajero o piloto
+            if (usuarioId && !Number.isNaN(Number(usuarioId))) {
+                filtro.usuario = Number(usuarioId);
+            }
+            if (pilotoId && !Number.isNaN(Number(pilotoId))) {
+                filtro.piloto = Number(pilotoId);
+            }
+        } else if (rol === 1) {
+            // Piloto: solo los viajes que tiene asignados
+            filtro.piloto = miId;
+        } else {
+            // Pasajero: solo los viajes que pidió
+            filtro.usuario = miId;
         }
 
         const viajes = await em.find(Viaje, filtro, {
@@ -77,12 +89,21 @@ async function findAllViajes(req: Request, res: Response){
     }   
 }
 
-async function findOneViaje(req: Request, res: Response){
+async function findOneViaje(req: AuthRequest, res: Response){
     try{
         const id = Number.parseInt(req.params.id as string);
         const viaje = await em.findOneOrFail(Viaje, {id}, {
             populate: ['usuario', 'piloto', 'origen', 'destino', 'review'],
         });
+
+        // Solo el admin, el pasajero del viaje o el piloto asignado pueden verlo
+        const miId = req.usuario!.id;
+        const esAdmin = req.usuario!.es_piloto === 2;
+        const esPasajero = viaje.usuario?.id === miId;
+        const esPilotoAsignado = viaje.piloto?.id === miId;
+        if (!esAdmin && !esPasajero && !esPilotoAsignado) {
+            return res.status(403).json({ message: 'No tenés permiso para ver este viaje' });
+        }
         res.status(200).json({message: 'found viaje',data: viaje});
     }catch(error:any){
         res.status(500).json({message: error.message});

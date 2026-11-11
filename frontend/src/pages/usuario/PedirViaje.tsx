@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { authHeaders, logout, getNombre } from '../../auth';
 import { API_URL } from '../../config';
 import socket, { connectSocket } from '../../socket';
+import type { Viaje } from '../../types';
 
 interface Planeta {
   nombre: string;
@@ -27,16 +28,29 @@ function PedirViaje() {
   const [viajeAceptado, setViajeAceptado] = useState<ViajeAceptado | null>(null);
   const [viajeFinalizado, setViajeFinalizado] = useState<ViajeAceptado | null>(null);
   const [error, setError] = useState('');
+  const [misViajes, setMisViajes] = useState<Viaje[]>([]);
 
   const API = API_URL;
 
+  // Trae los viajes del pasajero logueado (el back lo identifica por el token)
+  async function cargarMisViajes() {
+    const res = await fetch(`${API}/viajes/mios`, { headers: authHeaders() });
+    if (!res.ok) return;
+    const data = await res.json();
+    setMisViajes(data.data ?? []);
+  }
+
   useEffect(() => {
     connectSocket();
+
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    cargarMisViajes().catch(() => {});
 
     // El backend emite "viaje_aceptado" a la sala personal del pasajero
     socket.on('viaje_aceptado', (data: ViajeAceptado) => {
       setEstado('aceptado');
       setViajeAceptado(data);
+      cargarMisViajes();
     });
 
     socket.on('sin_pilotos', () => {
@@ -47,6 +61,7 @@ function PedirViaje() {
     // El piloto finalizó el viaje: habilitamos el acceso a la reseña.
     socket.on('viaje_finalizado', (data: ViajeAceptado) => {
       setViajeFinalizado(data);
+      cargarMisViajes();
     });
 
     return () => {
@@ -75,6 +90,7 @@ function PedirViaje() {
       const data = await res.json();
       if (data.message === 'viaje creado') {
         setEstado('esperando');
+        cargarMisViajes();
       } else {
         setError(data.message ?? 'Error al pedir el viaje');
       }
@@ -169,6 +185,36 @@ function PedirViaje() {
             <p>El piloto finalizó el viaje #{viajeFinalizado.viajeId}. Ya podés calificarlo.</p>
             <Link className="btn-primary" to="/mis-viajes">Dejar una reseña</Link>
           </div>
+        )}
+      </div>
+
+      <div className="card">
+        <h2>Mis viajes</h2>
+        {misViajes.length === 0 ? (
+          <p>Todavía no hiciste ningún viaje.</p>
+        ) : (
+          <table className="tabla">
+            <thead>
+              <tr><th>ID</th><th>Ruta</th><th>Estado</th><th>Precio</th><th>Reseña</th></tr>
+            </thead>
+            <tbody>
+              {misViajes.map((v) => (
+                <tr key={v.id}>
+                  <td>{v.id}</td>
+                  <td>{v.origen?.nombre} → {v.destino?.nombre}</td>
+                  <td><span className={`badge badge-${v.estado.toLowerCase()}`}>{v.estado}</span></td>
+                  <td>{v.precioCreditos} cr.</td>
+                  <td>
+                    {v.review
+                      ? `${v.review.puntaje}/5`
+                      : v.estado === 'FINALIZADO'
+                        ? <Link to="/mis-viajes">Calificar</Link>
+                        : '—'}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         )}
       </div>
     </div>

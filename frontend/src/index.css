@@ -139,6 +139,10 @@ code {
   padding: 64px 16px 32px;
 }
 
+.hero-home .acciones {
+  justify-content: center;
+}
+
 .hero-home p {
   margin: 0 auto 24px;
   max-width: 640px;

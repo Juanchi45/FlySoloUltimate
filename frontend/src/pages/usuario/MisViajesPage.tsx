@@ -46,7 +46,7 @@ function MisViajesPage() {
 
   async function recargarSeleccion(id: number) {
     await cargar();
-    const res = await fetch(`${API_URL}/viajes/verViaje/${id}`);
+    const res = await fetch(`${API_URL}/viajes/verViaje/${id}`, { headers: authHeaders() });
     const data = await res.json();
     if (res.ok) setSeleccionado(data.data);
   }

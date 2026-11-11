@@ -15,13 +15,13 @@ function NavBar() {
         <Link to="/">FlySolo</Link>
       </div>
       <div className="navbar-links">
-        {token && (
+        {token && rol !== 0 && (
           <Link className={linkClass('/planetas')} to="/planetas">Planetas</Link>
         )}
         {token && rol === 2 && (
           <Link className={linkClass('/naves')} to="/naves">Naves</Link>
         )}
-        {token && (
+        {token && rol !== 0 && (
           <Link className={linkClass('/viajes')} to="/viajes">Viajes</Link>
         )}
         {token && rol === 1 && (
