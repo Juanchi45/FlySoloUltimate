@@ -15,7 +15,7 @@
 *Sistema de solicitudes de viajes estilo Uber, con posibilidad de inscribirse como pasajero o piloto, junto con funcionalidades como indicar el pricipio y fin de viaje y reseñas hacia los pilotos.*
 
 ### Modelo
-![imagen del modelo]()
+![imagen del modelo](https://github.com/Juanchi45/FlySoloUltimate/blob/61119a5748ea7b41ba51860487ad4d4883c3e7e5/Modelo_de_dominio.jpg)
 
 *Nota*: incluir un link con la imagen de un modelo, puede ser modelo de dominio, diagrama de clases, DER. Si lo prefieren pueden utilizar diagramas con [Mermaid](https://mermaid.js.org) en lugar de imágenes.
 
